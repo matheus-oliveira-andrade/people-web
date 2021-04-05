@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
+import java.net.http.HttpRequest;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Date;
@@ -76,6 +77,11 @@ public class PeopleServlet extends HttpServlet {
 			throws ServletException, IOException {
 		try {
 
+			HttpSession sessionTestCookie = request.getSession();			
+			
+			List<People> pessoas = (List<People>)sessionTestCookie.getAttribute("peoplesList");
+			System.out.println("Existe session setada já: " + pessoas);
+			
 			Part filePart = request.getPart("arquivo");
 			String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
 			InputStream fileContent = filePart.getInputStream();

@@ -19,7 +19,9 @@ document.addEventListener("DOMContentLoaded", function () {
 			method: 'POST',
 			body: data,
 		})
-			.then(resp => resp.json())
+			.then(resp => {
+				return resp.json();
+			})
 			.then(data => insertDataTable(data))
 			.catch(err => console.log(err));
 
