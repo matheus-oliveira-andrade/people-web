@@ -4,48 +4,55 @@ import java.util.Date;
 
 public class People {
 	
-	private String Name;
-	private Date BirthDate;
-	private String Cpf;
-	private String Cep;
-	private int AddressNumber;
-	private String Complement;
+	private String name;
+	private Date birthDate;
+	private String cpf;
+	private String cep;
+	private int addressNumber;
+	private String complement;
+	private int id;
 	
 	public String getName() {
-		return Name;
+		return name;
 	}
 	public void setName(String name) {
-		Name = name;
+		this.name = name;
 	}
 	public Date getBirthDate() {
-		return BirthDate;
+		return birthDate;
 	}
 	public void setBirthDate(Date birthDate) {
-		BirthDate = birthDate;
+		this.birthDate = birthDate;
 	}
 	public String getCpf() {
-		return Cpf;
+		return cpf;
 	}
 	public void setCpf(String cpf) {
-		Cpf = cpf;
+		this.cpf = cpf;
 	}
 	public String getCep() {
-		return Cep;
+		return cep;
 	}
 	public void setCep(String cep) {
-		Cep = cep;
+		this.cep = cep;
 	}
 	public int getAddressNumber() {
-		return AddressNumber;
+		return addressNumber;
 	}
 	public void setAddressNumber(int addressNumber) {
-		AddressNumber = addressNumber;
+		this.addressNumber = addressNumber;
 	}
 	public String getComplement() {
-		return Complement;
+		return complement;
 	}
 	public void setComplement(String complement) {
-		Complement = complement;
+		this.complement = complement;
+	}
+	public int getId() {
+		return addressNumber;
+	}
+	public void setId(int id) {
+		this.id = id;
 	}
 		
 }

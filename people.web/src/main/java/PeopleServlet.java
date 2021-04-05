@@ -25,6 +25,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import models.ConvertToPeople;
 import models.People;
@@ -48,7 +49,7 @@ public class PeopleServlet extends HttpServlet {
 		File downloadFile = new File(relativePath + filePath);
 		String mimeType = Files.probeContentType(downloadFile.toPath());
 
-		FileInputStream inStream = new FileInputStream(downloadFile);		
+		FileInputStream inStream = new FileInputStream(downloadFile);
 
 		// Set header response to download
 		response.setContentType(mimeType);
@@ -93,27 +94,31 @@ public class PeopleServlet extends HttpServlet {
 
 			SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
 
-			for (String lineSplited : lines) {
-				String[] rowSplited = lineSplited.split(";");
+			for (int i = 0; i < lines.size(); i++) {
+				String[] rowSplited = lines.get(i).split(";");
 
-				People people = new People(); 
-				people.setName(rowSplited[0]);
-				//people.setBirthDate(formatterDate.parse(rowSplited[1]));
-				people.setCpf(rowSplited[2]);
-				people.setCep(rowSplited[3]);
-				people.setAddressNumber(Integer.parseInt(rowSplited[4]));
-				people.setComplement(rowSplited[5]);
-				
+				People people = new People();
+				people.setId(Integer.parseInt(rowSplited[0]));
+				people.setName(rowSplited[1]);
+				// people.setBirthDate(formatterDate.parse(rowSplited[2]));
+				people.setCpf(rowSplited[3]);
+				people.setCep(rowSplited[4]);
+				people.setAddressNumber(Integer.parseInt(rowSplited[5]));
+				people.setComplement(rowSplited[6]);
+
 				peoples.add(people);
 			}
-					
+
 			PeopleResponse peopleResponse = new PeopleResponse(peoples);
-		
+
+			HttpSession session = request.getSession();
+			session.setAttribute("peoplesList", peoples);
+			
 			Gson gson = new Gson();
-			String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());				
-			
+			String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());
+
 			response.getWriter().append(jsonResult);
-			
+
 			response.setStatus(200);
 
 		} catch (Exception e) {
