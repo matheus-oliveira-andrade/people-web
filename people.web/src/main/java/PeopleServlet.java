@@ -8,7 +8,12 @@ import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -22,7 +27,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import models.ConvertToPeople;
-import models.ReadFile;
+import models.People;
+import models.PeopleResponse;
 
 @WebServlet("/people")
 @MultipartConfig
@@ -42,9 +48,7 @@ public class PeopleServlet extends HttpServlet {
 		File downloadFile = new File(relativePath + filePath);
 		String mimeType = Files.probeContentType(downloadFile.toPath());
 
-		FileInputStream inStream = new FileInputStream(downloadFile);
-
-		System.out.println(filePath);
+		FileInputStream inStream = new FileInputStream(downloadFile);		
 
 		// Set header response to download
 		response.setContentType(mimeType);
@@ -69,31 +73,53 @@ public class PeopleServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		try {
 
-		Part filePart = request.getPart("arquivo");
-		String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
-		InputStream fileContent = filePart.getInputStream();
+			Part filePart = request.getPart("arquivo");
+			String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
+			InputStream fileContent = filePart.getInputStream();
 
-		System.out.println(fileName);
+			StringBuilder sb = new StringBuilder();
+			BufferedReader br = new BufferedReader(new InputStreamReader(fileContent, "UTF-8"));
 
-		StringBuilder sb = new StringBuilder();
-		BufferedReader br = new BufferedReader(new InputStreamReader(fileContent, "UTF-8"));
+			String line;
+			while ((line = br.readLine()) != null) {
+				sb.append(line + System.lineSeparator());
+			}
 
-		String line;
-		while ((line = br.readLine()) != null) {
-			sb.append(line + System.lineSeparator());
+			List<String> lines = Arrays.asList(sb.toString().split("\\r?\\n"));
+
+			List<People> peoples = new ArrayList<>();
+
+			SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
+
+			for (String lineSplited : lines) {
+				String[] rowSplited = lineSplited.split(";");
+
+				People people = new People(); 
+				people.setName(rowSplited[0]);
+				//people.setBirthDate(formatterDate.parse(rowSplited[1]));
+				people.setCpf(rowSplited[2]);
+				people.setCep(rowSplited[3]);
+				people.setAddressNumber(Integer.parseInt(rowSplited[4]));
+				people.setComplement(rowSplited[5]);
+				
+				peoples.add(people);
+			}
+					
+			PeopleResponse peopleResponse = new PeopleResponse(peoples);
+		
+			Gson gson = new Gson();
+			String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());				
+			
+			response.getWriter().append(jsonResult);
+			
+			response.setStatus(200);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
-		List<String> lines = Arrays.asList(sb.toString().split("\\r?\\n"));
-
-		System.out.println(lines);
-
-		// Type listType = new TypeToken<List<String>>() {}.getType();
-
-		// Gson gson = new Gson();
-		// String jsonResult = gson.toJson(lines, listType);
-
-		response.setStatus(200);
 	}
 
 }
