@@ -2,45 +2,55 @@
 <html lang="pt-br">
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<!-- Bootstrap CSS -->
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
-		integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+<!-- Bootstrap CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+	crossorigin="anonymous">
 
-	<title>Hello, world!</title>
+<title>Hello, world!</title>
 </head>
 
 <body>
-	<form action="/people-web/people" method="post" enctype="multipart/form-data">
+	<form action="/people-web/people" method="post"
+		enctype="multipart/form-data">
 		<div class="container">
 
 			<h3 class="mt-3">Pessoa</h3>
- 
+
 			<hr />
 
 			<div class="card mt-3">
-				<div class="card-header"><strong>Carregar arquivo</strong></div>
+				<div class="card-header">
+					<strong>Carregar arquivo</strong>
+				</div>
 				<div class="card-body">
 					<div class="row">
 						<div class="col-md-8">
 							<div class="mb-3">
 								<label for="formFileSm" class="form-label">Importação de
-									arquivo</label> <input class="form-control form-control-sm" name="arquivo" id="formFileSm" type="file" accept=".txt, .csv, .json" required />
+									arquivo</label> <input class="form-control form-control-sm"
+									name="arquivo" id="formFileSm" type="file"
+									accept=".txt, .csv, .json" required />
 							</div>
 						</div>
 
 						<div class="col-md-4 align-self-center">
 							<button type="submit" class="btn btn-primary" id="btnImport">Importar</button>
-							<a href="/people-web/people" class="btn btn-secondary">Modelo</a>
+							<a href="/people-web/file" class="btn btn-outline-primary">Modelo</a>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="card mt-3">
-				<div class="card-header"><strong>Lista de dados</strong></div>
+				<div class="card-header">
+					<strong>Lista de dados</strong>
+				</div>
 				<div class="card-body">
 
 					<table class="table table-striped" id="table-dados">
@@ -57,21 +67,23 @@
 							</tr>
 						</thead>
 						<tbody>
-							<!-- <tr> 
-								<th scope="row">1</th>
-								<td>Mark</td>
-								<td>Otto</td>
-								<td>@mdo</td>
-							</tr> -->
+							<!-- Data is loaded here -->
 						</tbody>
 					</table>
 
 				</div>
 			</div>
-		</div>
-	</form> 
 
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+			<div class="row mt-3">
+				<div class="col-md-12 text-end">
+					<button type="button" id="btnClearSession" class="btn btn-danger">Limpar dados</button>		
+				</div>
+			</div>
+		</div>
+	</form>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
 		crossorigin="anonymous"></script>
 	<script src="scripts.js"></script>

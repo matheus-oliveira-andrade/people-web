@@ -4,13 +4,13 @@ import java.util.Date;
 
 public class People {
 	
+	private int id;
 	private String name;
 	private Date birthDate;
 	private String cpf;
 	private String cep;
 	private int addressNumber;
-	private String complement;
-	private int id;
+	private String complement;	
 	
 	public String getName() {
 		return name;
@@ -49,10 +49,21 @@ public class People {
 		this.complement = complement;
 	}
 	public int getId() {
-		return addressNumber;
+		return id;
 	}
 	public void setId(int id) {
 		this.id = id;
 	}
+	
+	@Override
+	public String toString() {
+		return "People [id=" + id + ", name=" + name + ", birthDate=" + birthDate + ", cpf=" + cpf + ", cep=" + cep
+				+ ", addressNumber=" + addressNumber + ", complement=" + complement + ", getName()=" + getName()
+				+ ", getBirthDate()=" + getBirthDate() + ", getCpf()=" + getCpf() + ", getCep()=" + getCep()
+				+ ", getAddressNumber()=" + getAddressNumber() + ", getComplement()=" + getComplement() + ", getId()="
+				+ getId() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
+				+ super.toString() + "]";
+	}
 		
+	
 }
