@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			.then(data => {
 				if (data.success) {
 					console.log("Arquivo lido com sucesso");
+					console.log("id documento " + data.id);
 
 					insertDataInTable(data)
 				}

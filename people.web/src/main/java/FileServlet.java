@@ -20,6 +20,7 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import data.PeopleRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -77,11 +78,11 @@ public class FileServlet extends HttpServlet {
 			throws ServletException, IOException {
 		try {
 
-			HttpSession sessionTestCookie = request.getSession();			
-			
-			List<People> pessoas = (List<People>)sessionTestCookie.getAttribute("peoplesList");
+			HttpSession sessionTestCookie = request.getSession();
+
+			List<People> pessoas = (List<People>) sessionTestCookie.getAttribute("peoplesList");
 			System.out.println("Existe session setada já: " + pessoas);
-			
+
 			Part filePart = request.getPart("arquivo");
 			String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
 			InputStream fileContent = filePart.getInputStream();
@@ -98,27 +99,31 @@ public class FileServlet extends HttpServlet {
 
 			List<People> peoples = new ArrayList<>();
 
-			SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
+			// SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
 
+			int idPeople = 0;
 			for (int i = 0; i < lines.size(); i++) {
 				String[] rowSplited = lines.get(i).split(";");
 
 				People people = new People();
-				people.setId(Integer.parseInt(rowSplited[0]));
-				people.setName(rowSplited[1]);
-				// people.setBirthDate(formatterDate.parse(rowSplited[2]));
-				people.setCpf(rowSplited[3]);
-				people.setCep(rowSplited[4]);
-				people.setAddressNumber(Integer.parseInt(rowSplited[5]));
-				people.setComplement(rowSplited[6]);
+				people.setId(idPeople);
+				people.setName(rowSplited[0]);
+				// people.setBirthDate(formatterDate.parse(rowSplited[1]));
+				people.setCpf(rowSplited[2]);
+				people.setCep(rowSplited[3]);
+				people.setAddressNumber(Integer.parseInt(rowSplited[4]));
+				people.setComplement(rowSplited[5]);
 
 				peoples.add(people);
-			}
-
-			PeopleResponse peopleResponse = new PeopleResponse(peoples);
+				idPeople++;
+			}			
 
 			HttpSession session = request.getSession();
 			session.setAttribute("peoplesList", peoples);
+
+			String idDocument = new PeopleRepository().add(peoples);			
+
+			PeopleResponse peopleResponse = new PeopleResponse(peoples, idDocument);
 			
 			Gson gson = new Gson();
 			String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());
@@ -128,7 +133,8 @@ public class FileServlet extends HttpServlet {
 			response.setStatus(200);
 
 		} catch (Exception e) {
-			PeopleResponse peopleResponse = new PeopleResponse(false, "Arquivo fora do formato aceito, baixe o modelo para garantir que esteja no formato correto");
+			PeopleResponse peopleResponse = new PeopleResponse(false,
+					"Arquivo fora do formato aceito, baixe o modelo para garantir que esteja no formato correto");
 
 			Gson gson = new Gson();
 			String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());
