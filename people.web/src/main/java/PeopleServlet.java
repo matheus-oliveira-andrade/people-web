@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 
+import data.PeopleRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -35,26 +36,23 @@ public class PeopleServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		List<People> peoples = new ArrayList<People>();
+
 		HttpSession session = request.getSession();
-		List<People> peoples = (List<People>) session.getAttribute("peoplesList");
+		String idDocument = (String) session.getAttribute("idPeoplesList");
 
-		if (peoples == null) {
-			Gson gson = new Gson();
-			String jsonResult = gson.toJson(new PeopleResponse());
-
-			response.getWriter().append(jsonResult);
-
-			response.setStatus(200);
-		} else {
-			PeopleResponse peopleResponse = new PeopleResponse(peoples);
-
-			Gson gson = new Gson();
-			String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());
-
-			response.getWriter().append(jsonResult);
-
-			response.setStatus(200);
+		if (idDocument != null) {
+			peoples = new PeopleRepository().getAll(idDocument);
 		}
+
+		PeopleResponse peopleResponse = new PeopleResponse(peoples);
+
+		Gson gson = new Gson();
+		String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());
+
+		response.getWriter().append(jsonResult);
+
+		response.setStatus(200);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -155,9 +153,13 @@ public class PeopleServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		HttpSession session = request.getSession();
-		List<People> peoples = (List<People>) session.getAttribute("peoplesList");
+		List<People> peoples;
 
-		if (peoples == null) {
+		String idDocument = (String) session.getAttribute("idPeoplesList");
+
+		if (idDocument != null) {
+			peoples = new ArrayList<People>(new PeopleRepository().getAll(idDocument));
+		} else {
 			PeopleResponse peopleResponse = new PeopleResponse(false, "Sessão expirada");
 
 			Gson gson = new Gson();
@@ -166,53 +168,53 @@ public class PeopleServlet extends HttpServlet {
 			response.getWriter().append(jsonResult);
 
 			response.setStatus(200);
-		} else {
 
-			StringBuilder sb = new StringBuilder();
-			BufferedReader reader = request.getReader();
-			try {
-				String line;
-				while ((line = reader.readLine()) != null) {
-					sb.append(line).append('\n');
-				}
-			} finally {
-				reader.close();
+			return;
+		}
+
+		StringBuilder sb = new StringBuilder();
+		BufferedReader reader = request.getReader();
+		try {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line).append('\n');
 			}
+		} finally {
+			reader.close();
+		}
 
-			JSONObject jsonObject = new JSONObject(sb.toString());
-			int id = jsonObject.getInt("id");
+		JSONObject jsonObject = new JSONObject(sb.toString());
+		int id = jsonObject.getInt("id");
 
-			System.out.println(id);
-
-			int index = -1;
-			for (int i = 0; i < peoples.size(); i++) {
-				if (peoples.get(i).getId() == id) {
-					index = i;
-					break;
-				}
+		int index = -1;
+		for (int i = 0; i < peoples.size(); i++) {
+			if (peoples.get(i).getId() == id) {
+				index = i;
+				break;
 			}
+		}
 
-			// not found
-			if (index == -1) {
-				PeopleResponse peopleResponse = new PeopleResponse(false, "Id não encontrado");
+		// not found
+		if (index == -1) {
+			PeopleResponse peopleResponse = new PeopleResponse(false, "Id não encontrado");
 
-				Gson gson = new Gson();
-				String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());
-
-				response.getWriter().append(jsonResult);
-				response.setStatus(404);
-				return;
-			}
-
-			peoples.remove(index);
-
-			PeopleResponse peopleResponse = new PeopleResponse();
 			Gson gson = new Gson();
 			String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());
 
 			response.getWriter().append(jsonResult);
-			response.setStatus(200);
+			response.setStatus(404);
+			return;
 		}
 
+		peoples.remove(index);
+
+		new PeopleRepository().edit(peoples, idDocument);
+
+		PeopleResponse peopleResponse = new PeopleResponse();
+		Gson gson = new Gson();
+		String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());
+
+		response.getWriter().append(jsonResult);
+		response.setStatus(200);
 	}
 }

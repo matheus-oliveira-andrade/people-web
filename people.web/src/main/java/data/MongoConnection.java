@@ -9,7 +9,7 @@ import com.mongodb.MongoClient;
 
 public class MongoConnection {
 
-	public DB GetConnection(String dbName) throws UnknownHostException {
+	public DB getConnection(String dbName) throws UnknownHostException {
 
 		if (dbName == null)
 			dbName = "db";

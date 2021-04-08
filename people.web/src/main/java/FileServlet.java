@@ -123,6 +123,8 @@ public class FileServlet extends HttpServlet {
 
 			String idDocument = new PeopleRepository().add(peoples);			
 
+			session.setAttribute("idPeoplesList", idDocument);
+			
 			PeopleResponse peopleResponse = new PeopleResponse(peoples, idDocument);
 			
 			Gson gson = new Gson();

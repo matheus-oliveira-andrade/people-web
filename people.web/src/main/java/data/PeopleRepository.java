@@ -1,16 +1,17 @@
 package data;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bson.types.ObjectId;
 
 import com.google.gson.Gson;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 
 import Interfaces.PeopleRepositoryInterface;
@@ -20,108 +21,71 @@ public class PeopleRepository implements PeopleRepositoryInterface {
 
 	private final String collection = "peoples";
 
-	public List<People> getAll() {
-		try {
-			DBCollection coll;
-			coll = GetConnection().getCollection(this.collection);
+	public List<People> getAll(String idDocument) throws UnknownHostException {
+		DBCollection collection = getConnection().getCollection(this.collection);
 
-			DBCursor cursor = coll.find();
-			try {
-				while (cursor.hasNext()) {
-					System.out.println(cursor.next());
-				}
-			} finally {
-				cursor.close();
-			}
+		BasicDBObject query = new BasicDBObject();
+		query.put("_id", new ObjectId(idDocument));
 
-			return new ArrayList<People>();
+		DBObject dbObj = collection.findOne(query);
 
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return null;
-		}
+		List<People> peoples = (List<People>) Arrays.asList(new Gson().fromJson((String) dbObj.get("peoples"), People[].class));
+
+		return peoples;
 	}
 
-	public People getById() {
-		DBCollection coll;
-		try {
-			coll = GetConnection().getCollection(this.collection);
+	public People getById(String idDocument, int index) throws UnknownHostException {
+		DBCollection collection = getConnection().getCollection(this.collection);
 
-			BasicDBObject query = new BasicDBObject("i", 71);
+		BasicDBObject query = new BasicDBObject();
+		query.put("_id", new ObjectId(idDocument));
 
-			DBCursor cursor = coll.find(query);
+		DBObject dbObj = collection.findOne(query);
 
-			try {
-				while (cursor.hasNext()) {
-					System.out.println(cursor.next());
-				}
-			} finally {
-				cursor.close();
-			}
-			return new People();
+		List<People> peoples = Arrays.asList(new Gson().fromJson((String) dbObj.get("peoples"), People[].class));
 
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return null;
-		}
-
+		return peoples.get(index);
 	}
 
-	public String add(List<People> peoples) {
+	public String add(List<People> peoples) throws UnknownHostException {
+		DBCollection collection = getConnection().getCollection(this.collection);
 
-		try {
-			DBCollection coll;
-			coll = GetConnection().getCollection(this.collection);
+		Gson gson = new Gson();
+		String peoplesJson = gson.toJson(peoples);
 
-			Gson gson = new Gson();
-			String peoplesJson = gson.toJson(peoples);
+		BasicDBObject doc = new BasicDBObject("peoples", peoplesJson);
 
-			BasicDBObject doc = new BasicDBObject("peoples", peoplesJson);
+		collection.insert(doc);
 
-			WriteResult result = coll.insert(doc);
+		ObjectId id = (ObjectId) doc.get("_id");
 
-			ObjectId id = (ObjectId) doc.get("_id");
-
-			return id.toString();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return null;
-		}
-
+		return id.toString();
 	}
 
-	public void edit(People people) {
-		try {
-			DBCollection coll;
-			coll = GetConnection().getCollection(this.collection);
+	public void edit(List<People> peoples, String idDocument) throws UnknownHostException {
+		DBCollection collection = getConnection().getCollection(this.collection);
 
-			BasicDBObject query = new BasicDBObject();
-			query.put("id", people.getId());
+		BasicDBObject query = new BasicDBObject();
+		query.put("_id", new ObjectId(idDocument));
 
-			BasicDBObject updateObject = new BasicDBObject("name", "MongoDB").append("type", "database")
-					.append("count", 1).append("info", new BasicDBObject("x", 203).append("y", 102));
+		Gson gson = new Gson();
+		String peoplesJson = gson.toJson(peoples);
 
-			coll.update(query, updateObject);
+		BasicDBObject doc = new BasicDBObject("peoples", peoplesJson);
 
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		collection.update(query, doc);
 	}
 
-	public void delete(People people) {
-		try {
-			DBCollection coll;
-			coll = GetConnection().getCollection(this.collection);
+	public void delete(People people, String idDocument) throws UnknownHostException {
+		DBCollection collection = getConnection().getCollection(this.collection);
 
-			coll.remove(new BasicDBObject());
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		BasicDBObject query = new BasicDBObject();
+		query.put("_id", new ObjectId(idDocument));
+
+		collection.remove(query);
 	}
 
-	private DB GetConnection() throws UnknownHostException {
-		return new MongoConnection().GetConnection(null);
+	private DB getConnection() throws UnknownHostException {
+		return new MongoConnection().getConnection(null);
 	}
 }
