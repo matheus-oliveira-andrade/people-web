@@ -23,7 +23,7 @@ public class SessionServlet extends HttpServlet {
 			throws ServletException, IOException {
 		
 		HttpSession session = request.getSession();
-		session.removeAttribute("peoplesList");
+		session.removeAttribute("idPeoplesList");
 	}
 
 }

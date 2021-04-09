@@ -100,28 +100,40 @@ public class PeopleServlet extends HttpServlet {
 	}
 
 	protected void doPut(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		int id = Integer.parseInt(request.getParameter("id"));
-		String name = request.getParameter("name");
-		// request.getParameter("birthDate");
-		String cpf = request.getParameter("cpf");
-		String cep = request.getParameter("cep");
-		int addressNumber = Integer.parseInt(request.getParameter("addressNumber"));
-		String complement = request.getParameter("complement");
+			throws ServletException, IOException {	
+		
+		StringBuilder sb = new StringBuilder();
+		BufferedReader reader = request.getReader();
+		try {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line).append('\n');
+			}
+		} finally {
+			reader.close();
+		}
+
+		JSONObject jsonObject = new JSONObject(sb.toString());				
+		
+		int id = jsonObject.getInt("id");
+		String name = jsonObject.getString("name");
+		String cpf = jsonObject.getString("cpf");
+		String cep = jsonObject.getString("cep");
+		int addressNumber = jsonObject.getInt("addressNumber");
+		String complement = jsonObject.getString("complement");
 
 		People people = new People();
 		people.setId(id);
 		people.setName(name);
-		// people.setBirthDate(birthDate);
 		people.setCpf(cpf);
 		people.setCep(cep);
 		people.setAddressNumber(addressNumber);
-		people.setComplement(complement);
-
+		people.setComplement(complement);		
+		
 		HttpSession session = request.getSession();
-		List<People> peoples = (List<People>) session.getAttribute("peoplesList");
+		String idDocument = (String) session.getAttribute("idPeoplesList");
 
-		if (peoples == null) {
+		if (idDocument == null) {
 			PeopleResponse peopleResponse = new PeopleResponse(false, "Não existe sessão setada");
 
 			Gson gson = new Gson();
@@ -130,23 +142,24 @@ public class PeopleServlet extends HttpServlet {
 			response.getWriter().append(jsonResult);
 
 			response.setStatus(200);
-		} else {
-			peoples.set(id, people);
 
-			PeopleResponse peopleResponse = new PeopleResponse(peoples);
-
-			HttpSession sessionPeoples = request.getSession();
-			sessionPeoples.setAttribute("peoplesList", peoples);
-
-			PeopleResponse peopleResp = new PeopleResponse(peoples);
-
-			Gson gson = new Gson();
-			String jsonResult = gson.toJson(peopleResp, peopleResp.getClass());
-
-			response.getWriter().append(jsonResult);
-
-			response.setStatus(200);
+			return;
 		}
+
+		List<People> peoples = new ArrayList<People>(new PeopleRepository().getAll(idDocument));
+
+		peoples.set(id, people);
+
+		new PeopleRepository().edit(peoples, idDocument);
+
+		PeopleResponse peopleResp = new PeopleResponse(peoples);
+
+		Gson gson = new Gson();
+		String jsonResult = gson.toJson(peopleResp, peopleResp.getClass());
+
+		response.getWriter().append(jsonResult);
+
+		response.setStatus(200);
 	}
 
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response)

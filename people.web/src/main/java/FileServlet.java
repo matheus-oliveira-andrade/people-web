@@ -76,13 +76,7 @@ public class FileServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		try {
-
-			HttpSession sessionTestCookie = request.getSession();
-
-			List<People> pessoas = (List<People>) sessionTestCookie.getAttribute("peoplesList");
-			System.out.println("Existe session setada já: " + pessoas);
-
+		try {			
 			Part filePart = request.getPart("arquivo");
 			String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
 			InputStream fileContent = filePart.getInputStream();
@@ -99,8 +93,6 @@ public class FileServlet extends HttpServlet {
 
 			List<People> peoples = new ArrayList<>();
 
-			// SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
-
 			int idPeople = 0;
 			for (int i = 0; i < lines.size(); i++) {
 				String[] rowSplited = lines.get(i).split(";");
@@ -108,7 +100,6 @@ public class FileServlet extends HttpServlet {
 				People people = new People();
 				people.setId(idPeople);
 				people.setName(rowSplited[0]);
-				// people.setBirthDate(formatterDate.parse(rowSplited[1]));
 				people.setCpf(rowSplited[2]);
 				people.setCep(rowSplited[3]);
 				people.setAddressNumber(Integer.parseInt(rowSplited[4]));
@@ -118,11 +109,10 @@ public class FileServlet extends HttpServlet {
 				idPeople++;
 			}			
 
-			HttpSession session = request.getSession();
-			session.setAttribute("peoplesList", peoples);
-
 			String idDocument = new PeopleRepository().add(peoples);			
 
+			HttpSession session = request.getSession();			
+			
 			session.setAttribute("idPeoplesList", idDocument);
 			
 			PeopleResponse peopleResponse = new PeopleResponse(peoples, idDocument);

@@ -1,8 +1,12 @@
+var modal = new bootstrap.Modal(document.querySelector("#modalEdicao"), null);
+
 document.addEventListener("DOMContentLoaded", function () {
- 
+
 	let btnImport = document.querySelector("#btnImport");
 	let btnClearSession = document.querySelector("#btnClearSession");
 	let inputFile = document.querySelector("input[type='file']");
+	let modalEdit = document.getElementById("modalEdicao");
+	let btnModalEdit = document.getElementById("btnSalvarEdicao");
 
 	btnImport.addEventListener("click", function (e) {
 		e.preventDefault();
@@ -38,6 +42,24 @@ document.addEventListener("DOMContentLoaded", function () {
 	});
 
 	btnClearSession.addEventListener("click", clearSession);
+
+	modalEdit.addEventListener("hidden.bs.modal", function (event) {
+		let idInput = document.getElementById("id");
+		let nameInput = document.getElementById("name");
+		let cpfInput = document.getElementById("cpf");
+		let cepInput = document.getElementById("cep");
+		let addressnumberInput = document.getElementById("addressNumber");
+		let complementInput = document.getElementById("complement");
+
+		idInput.value = '';
+		nameInput.value = '';
+		cpfInput.value = '';
+		cepInput.value = '';
+		addressnumberInput.value = '';
+		complementInput.value = '';
+	})
+
+	btnModalEdit.addEventListener("click", editData);
 
 	// get data in server on load of page
 	loadData();
@@ -92,6 +114,11 @@ function insertDataInTable(data) {
 		linkEditar.innerText = "Editar";
 		linkEditar.setAttribute("name", "linkEditar");
 		linkEditar.dataset.id = people.id;
+		linkEditar.dataset.name = people.name;
+		linkEditar.dataset.cpf = people.cpf;
+		linkEditar.dataset.cep = people.cep;
+		linkEditar.dataset.addressnumber = people.addressNumber;
+		linkEditar.dataset.complement = people.complement;
 
 		tableDataEditar.appendChild(linkEditar);
 
@@ -119,8 +146,29 @@ function insertDataInTable(data) {
 	// Set event for each row in table 
 	let linksEditar = document.querySelectorAll("a[name='linkEditar']");
 	let linksExcluir = document.querySelectorAll("a[name='linkExcluir']");
-	linksEditar.forEach(element => element.addEventListener("click", editData));
+	linksEditar.forEach(element => element.addEventListener("click", setDataModal));
 	linksExcluir.forEach(element => element.addEventListener("click", deleteData));
+}
+
+function setDataModal(e) {	
+	modal.show();	
+
+	let data = e.target.dataset;
+
+	let idInput = document.getElementById("id");
+	let nameInput = document.getElementById("name");
+	let cpfInput = document.getElementById("cpf");
+	let cepInput = document.getElementById("cep");
+	let addressnumberInput = document.getElementById("addressNumber");
+	let complementInput = document.getElementById("complement");
+
+	idInput.value = data.id;
+	nameInput.value = data.name;
+	cpfInput.value = data.cpf;
+	cepInput.value = data.cep;
+	addressnumberInput.value = data.addressnumber;
+	complementInput.value = data.complement;
+
 }
 
 function deleteData(e) {
@@ -154,7 +202,49 @@ function deleteData(e) {
 }
 
 function editData(e) {
-	console.log(e.target.dataset.id);
+
+	let id = document.getElementById("id").value;
+	let name = document.getElementById("name").value;
+	let cpf = document.getElementById("cpf").value;
+	let cep = document.getElementById("cep").value;
+	let addressNumber = document.getElementById("addressNumber").value;
+	let complement = document.getElementById("complement").value;
+
+	if (!id || !name || !cpf || !cep || !addressNumber || !complement) {
+		alert("Nenhum campo deve ficar em branco");
+		return;
+	}
+
+	let data = {
+		id,
+		name,
+		cpf,
+		cep,
+		addressNumber,
+		complement,
+	};
+
+	fetch("/people-web/people", {
+		method: 'PUT',
+		body: JSON.stringify(data),
+	})
+		.then(resp => {
+			return resp.json();
+		})
+		.then(data => {
+			if (data.success) {
+				console.log("Editado com sucesso");
+				
+				modal.hide();
+
+				// reload grid
+				loadData();
+			}
+			else {
+				console.log(data.message);
+			}
+		})
+		.catch(err => console.log(err));
 }
 
 function clearSession() {
