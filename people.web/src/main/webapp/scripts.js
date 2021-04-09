@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			return;
 
 		let file = document.querySelector("input[type='file']").files[0];
-
+ 
 		var data = new FormData()
 		data.append("arquivo", file);
 
@@ -30,9 +30,11 @@ document.addEventListener("DOMContentLoaded", function () {
 			.then(data => {
 				if (data.success) {
 					console.log("Arquivo lido com sucesso");
-					console.log("id documento " + data.id);
 
-					insertDataInTable(data)
+					insertDataInTable(data);
+
+					document.getElementById("peloID-tab").dispatchEvent(new Event("click"));
+					document.getElementById("idDocumento").value = data.id;
 				}
 				else {
 					console.log(data.message);
@@ -150,8 +152,8 @@ function insertDataInTable(data) {
 	linksExcluir.forEach(element => element.addEventListener("click", deleteData));
 }
 
-function setDataModal(e) {	
-	modal.show();	
+function setDataModal(e) {
+	modal.show();
 
 	let data = e.target.dataset;
 
@@ -234,7 +236,7 @@ function editData(e) {
 		.then(data => {
 			if (data.success) {
 				console.log("Editado com sucesso");
-				
+
 				modal.hide();
 
 				// reload grid
