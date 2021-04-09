@@ -36,6 +36,26 @@ public class PeopleServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		String idDocumentUrl = request.getParameter("idDocument");		
+		
+		if (idDocumentUrl != null && idDocumentUrl != "") {
+			List<People> peoples = new PeopleRepository().getAll(idDocumentUrl);
+
+			HttpSession session = request.getSession();
+			session.setAttribute("idPeoplesList", idDocumentUrl);
+
+			PeopleResponse peopleResponse = new PeopleResponse(peoples);
+
+			Gson gson = new Gson();
+			String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());
+
+			response.getWriter().append(jsonResult);
+
+			response.setStatus(200);
+
+			return;
+		}
+
 		List<People> peoples = new ArrayList<People>();
 
 		HttpSession session = request.getSession();
@@ -100,8 +120,8 @@ public class PeopleServlet extends HttpServlet {
 	}
 
 	protected void doPut(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {	
-		
+			throws ServletException, IOException {
+
 		StringBuilder sb = new StringBuilder();
 		BufferedReader reader = request.getReader();
 		try {
@@ -113,8 +133,8 @@ public class PeopleServlet extends HttpServlet {
 			reader.close();
 		}
 
-		JSONObject jsonObject = new JSONObject(sb.toString());				
-		
+		JSONObject jsonObject = new JSONObject(sb.toString());
+
 		int id = jsonObject.getInt("id");
 		String name = jsonObject.getString("name");
 		String cpf = jsonObject.getString("cpf");
@@ -128,8 +148,8 @@ public class PeopleServlet extends HttpServlet {
 		people.setCpf(cpf);
 		people.setCep(cep);
 		people.setAddressNumber(addressNumber);
-		people.setComplement(complement);		
-		
+		people.setComplement(complement);
+
 		HttpSession session = request.getSession();
 		String idDocument = (String) session.getAttribute("idPeoplesList");
 

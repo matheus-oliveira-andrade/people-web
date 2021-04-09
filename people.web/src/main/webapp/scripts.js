@@ -4,47 +4,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	let btnImport = document.querySelector("#btnImport");
 	let btnClearSession = document.querySelector("#btnClearSession");
-	let inputFile = document.querySelector("input[type='file']");
 	let modalEdit = document.getElementById("modalEdicao");
 	let btnModalEdit = document.getElementById("btnSalvarEdicao");
+	let btnLoadbyId = document.getElementById("btnCarregar");
 
-	btnImport.addEventListener("click", function (e) {
-		e.preventDefault();
-
-		// Não foi selecionado nenhum arquivo
-		if (inputFile.files.length <= 0)
-			return;
-
-		let file = document.querySelector("input[type='file']").files[0];
- 
-		var data = new FormData()
-		data.append("arquivo", file);
-
-		fetch("/people-web/file", {
-			method: 'POST',
-			body: data,
-		})
-			.then(resp => {
-				return resp.json();
-			})
-			.then(data => {
-				if (data.success) {
-					console.log("Arquivo lido com sucesso");
-
-					insertDataInTable(data);
-
-					document.getElementById("peloID-tab").dispatchEvent(new Event("click"));
-					document.getElementById("idDocumento").value = data.id;
-				}
-				else {
-					console.log(data.message);
-				}
-			})
-			.catch(err => console.log(err));
-	});
+	btnImport.addEventListener("click", importFile);
 
 	btnClearSession.addEventListener("click", clearSession);
-
+ 
 	modalEdit.addEventListener("hidden.bs.modal", function (event) {
 		let idInput = document.getElementById("id");
 		let nameInput = document.getElementById("name");
@@ -63,6 +30,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	btnModalEdit.addEventListener("click", editData);
 
+	btnLoadbyId.addEventListener("click", loadDataById)
+
 	// get data in server on load of page
 	loadData();
 });
@@ -75,6 +44,62 @@ function loadData() {
 			return resp.json();
 		})
 		.then(data => insertDataInTable(data))
+		.catch(err => console.log(err));
+}
+
+function loadDataById() {
+
+	let idDocument = document.getElementById("idDocumento").value;
+
+	// dont have value
+	if (!idDocument)
+		return;
+
+	fetch("/people-web/people?idDocument=" + idDocument, {
+		method: 'GET',
+	})
+		.then(resp => {
+			return resp.json();
+		})
+		.then(data => insertDataInTable(data))
+		.catch(err => console.log(err));
+}
+
+function importFile(e) {
+
+	e.preventDefault();
+
+	let inputFile = document.querySelector("input[type='file']");
+
+	// Not selected file
+	if (inputFile.files.length <= 0)
+		return;
+
+	let file = document.querySelector("input[type='file']").files[0];
+
+	var data = new FormData()
+	data.append("arquivo", file);
+
+	fetch("/people-web/file", {
+		method: 'POST',
+		body: data,
+	})
+		.then(resp => {
+			return resp.json();
+		})
+		.then(data => {
+			if (data.success) {
+				console.log("Arquivo lido com sucesso");
+
+				insertDataInTable(data);
+
+				document.getElementById("peloID-tab").dispatchEvent(new Event("click"));
+				document.getElementById("idDocumento").value = data.id;
+			}
+			else {
+				console.log(data.message);
+			}
+		})
 		.catch(err => console.log(err));
 }
 
