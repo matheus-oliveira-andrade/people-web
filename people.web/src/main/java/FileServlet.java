@@ -76,7 +76,7 @@ public class FileServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		try {			
+		try {
 			Part filePart = request.getPart("arquivo");
 			String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
 			InputStream fileContent = filePart.getInputStream();
@@ -107,16 +107,17 @@ public class FileServlet extends HttpServlet {
 
 				peoples.add(people);
 				idPeople++;
-			}			
+			}
 
-			String idDocument = new PeopleRepository().add(peoples);			
+			String idDocument = new PeopleRepository().add(peoples);
 
-			HttpSession session = request.getSession();			
-			
+			HttpSession session = request.getSession();
+
 			session.setAttribute("idPeoplesList", idDocument);
-			
+
 			PeopleResponse peopleResponse = new PeopleResponse(peoples, idDocument);
-			
+			peopleResponse.setId(idDocument);
+
 			Gson gson = new Gson();
 			String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());
 

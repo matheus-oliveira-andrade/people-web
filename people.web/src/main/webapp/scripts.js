@@ -3,15 +3,12 @@ var modal = new bootstrap.Modal(document.querySelector("#modalEdicao"), null);
 document.addEventListener("DOMContentLoaded", function () {
 
 	let btnImport = document.querySelector("#btnImport");
-	let btnClearSession = document.querySelector("#btnClearSession");
 	let modalEdit = document.getElementById("modalEdicao");
 	let btnModalEdit = document.getElementById("btnSalvarEdicao");
 	let btnLoadbyId = document.getElementById("btnCarregar");
-
+ 
 	btnImport.addEventListener("click", importFile);
 
-	btnClearSession.addEventListener("click", clearSession);
- 
 	modalEdit.addEventListener("hidden.bs.modal", function (event) {
 		let idInput = document.getElementById("id");
 		let nameInput = document.getElementById("name");
@@ -110,10 +107,20 @@ function insertDataInTable(data) {
 	// don't have data
 	if (!peoples || peoples.length <= 0) {
 		tableBody.innerHTML = "";
-		document.querySelector("#btnClearSession").style.visibility = 'hidden';
+
+		let btnExportar = document.querySelector("#btnExportar")
+		btnExportar.style.visibility = 'hidden';
+		btnExportar.setAttribute("href", "/people-web/export");
+
 		return;
-	} else
-		document.querySelector("#btnClearSession").style.visibility = 'visible';
+	} else {
+		let btnExportar = document.querySelector("#btnExportar")
+		btnExportar.style.visibility = 'visible';
+
+		console.log("id = " + data.id);
+
+		btnExportar.setAttribute("href", btnExportar.getAttribute("href") + "?idDocument=" + data.id);
+	}
 
 	// clear data in table
 	tableBody.innerHTML = "";

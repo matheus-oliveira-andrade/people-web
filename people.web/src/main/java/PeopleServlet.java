@@ -36,8 +36,8 @@ public class PeopleServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		String idDocumentUrl = request.getParameter("idDocument");		
-		
+		String idDocumentUrl = request.getParameter("idDocument");
+
 		if (idDocumentUrl != null && idDocumentUrl != "") {
 			List<People> peoples = new PeopleRepository().getAll(idDocumentUrl);
 
@@ -45,6 +45,7 @@ public class PeopleServlet extends HttpServlet {
 			session.setAttribute("idPeoplesList", idDocumentUrl);
 
 			PeopleResponse peopleResponse = new PeopleResponse(peoples);
+			peopleResponse.setId(idDocumentUrl);
 
 			Gson gson = new Gson();
 			String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());
@@ -66,6 +67,7 @@ public class PeopleServlet extends HttpServlet {
 		}
 
 		PeopleResponse peopleResponse = new PeopleResponse(peoples);
+		peopleResponse.setId(idDocument);
 
 		Gson gson = new Gson();
 		String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());
