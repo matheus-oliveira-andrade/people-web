@@ -11,6 +11,7 @@ public class People {
 	private String cep;
 	private int addressNumber;
 	private String complement;
+	private Address address;
 
 	public String getName() {
 		return name;
@@ -66,6 +67,14 @@ public class People {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
 	}
 
 	@Override

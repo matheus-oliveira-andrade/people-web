@@ -1,1 +1,1 @@
-indexIncremental;nomeDaPessoa;dataDeNascimento;Cpf;Cep;NumeroCasa;Complemento
+Nome;Cpf;Cep;Numero;Complemento

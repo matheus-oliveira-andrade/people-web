@@ -95,15 +95,19 @@ public class FileServlet extends HttpServlet {
 
 			int idPeople = 0;
 			for (int i = 0; i < lines.size(); i++) {
-				String[] rowSplited = lines.get(i).split(";");
-
+				String[] rowSplited = lines.get(i).split(";");					
+				
 				People people = new People();
 				people.setId(idPeople);
 				people.setName(rowSplited[0]);
-				people.setCpf(rowSplited[2]);
-				people.setCep(rowSplited[3]);
-				people.setAddressNumber(Integer.parseInt(rowSplited[4]));
-				people.setComplement(rowSplited[5]);
+				people.setCpf(rowSplited[1]);
+				people.setCep(rowSplited[2]);
+				people.setAddressNumber(Integer.parseInt(rowSplited[3]));
+
+				if (rowSplited.length < 5)
+					people.setComplement("");
+				else
+					people.setComplement(rowSplited[4]);
 
 				peoples.add(people);
 				idPeople++;
@@ -127,7 +131,8 @@ public class FileServlet extends HttpServlet {
 
 		} catch (Exception e) {
 			PeopleResponse peopleResponse = new PeopleResponse(false,
-					"Arquivo fora do formato aceito, baixe o modelo para garantir que esteja no formato correto");
+					"Arquivo fora do formato aceito, baixe o modelo para garantir que esteja no formato correto" + "  "
+							+ e.getStackTrace()[0].toString());
 
 			Gson gson = new Gson();
 			String jsonResult = gson.toJson(peopleResponse, peopleResponse.getClass());

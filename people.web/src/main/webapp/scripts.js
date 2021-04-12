@@ -1,15 +1,15 @@
 var modal = new bootstrap.Modal(document.querySelector("#modalEdicao"), null);
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
 
 	let btnImport = document.querySelector("#btnImport");
 	let modalEdit = document.getElementById("modalEdicao");
 	let btnModalEdit = document.getElementById("btnSalvarEdicao");
 	let btnLoadbyId = document.getElementById("btnCarregar");
- 
+
 	btnImport.addEventListener("click", importFile);
 
-	modalEdit.addEventListener("hidden.bs.modal", function (event) {
+	modalEdit.addEventListener("hidden.bs.modal", function(event) {
 		let idInput = document.getElementById("id");
 		let nameInput = document.getElementById("name");
 		let cpfInput = document.getElementById("cpf");
@@ -41,14 +41,14 @@ function loadData() {
 			return resp.json();
 		})
 		.then(data => insertDataInTable(data))
-		.catch(err => console.log(err));
+		.catch(err => alert(err));
 }
 
 function loadDataById() {
 
 	let idDocument = document.getElementById("idDocumento").value;
 
-	// dont have value
+	// don't have value
 	if (!idDocument)
 		return;
 
@@ -59,7 +59,7 @@ function loadDataById() {
 			return resp.json();
 		})
 		.then(data => insertDataInTable(data))
-		.catch(err => console.log(err));
+		.catch(err => alert(err));
 }
 
 function importFile(e) {
@@ -86,7 +86,7 @@ function importFile(e) {
 		})
 		.then(data => {
 			if (data.success) {
-				console.log("Arquivo lido com sucesso");
+				// console.log("Arquivo lido com sucesso");
 
 				insertDataInTable(data);
 
@@ -94,10 +94,10 @@ function importFile(e) {
 				document.getElementById("idDocumento").value = data.id;
 			}
 			else {
-				console.log(data.message);
+				alert(data.message);
 			}
 		})
-		.catch(err => console.log(err));
+		.catch(err => alert(err));
 }
 
 function insertDataInTable(data) {
@@ -110,16 +110,14 @@ function insertDataInTable(data) {
 
 		let btnExportar = document.querySelector("#btnExportar")
 		btnExportar.style.visibility = 'hidden';
-		btnExportar.setAttribute("href", "/people-web/export");
+		btnExportar.setAttribute("href", "#");
 
 		return;
 	} else {
 		let btnExportar = document.querySelector("#btnExportar")
-		btnExportar.style.visibility = 'visible';
+		btnExportar.style.visibility = 'visible';		
 
-		console.log("id = " + data.id);
-
-		btnExportar.setAttribute("href", btnExportar.getAttribute("href") + "?idDocument=" + data.id);
+		btnExportar.setAttribute("href", "/people-web/export?idDocument=" + data.id);
 	}
 
 	// clear data in table
@@ -132,6 +130,7 @@ function insertDataInTable(data) {
 		let tableDataCep = document.createElement("td");
 		let tableDataNumero = document.createElement("td");
 		let tableDataComplemento = document.createElement("td");
+		let tableDataDetalhes = document.createElement("td");
 		let tableDataEditar = document.createElement("td");
 		let tableDataExcluir = document.createElement("td");
 
@@ -142,9 +141,14 @@ function insertDataInTable(data) {
 		tableDataNumero.innerHTML = people.addressNumber;
 		tableDataComplemento.innerHTML = people.complement;
 
+		let linkDetalhes = document.createElement("a");
+		linkDetalhes.href = "/people-web/pessoa-detalhes?id=" + people.id;		
+		linkDetalhes.innerText = "Detalhes";
+
+		tableDataDetalhes.appendChild(linkDetalhes);
+
 		let linkEditar = document.createElement("a");
 		linkEditar.href = "#";
-		linkEditar.innerText = "Editar";
 		linkEditar.innerText = "Editar";
 		linkEditar.setAttribute("name", "linkEditar");
 		linkEditar.dataset.id = people.id;
@@ -171,6 +175,7 @@ function insertDataInTable(data) {
 		tableRow.appendChild(tableDataCep);
 		tableRow.appendChild(tableDataNumero);
 		tableRow.appendChild(tableDataComplemento);
+		tableRow.appendChild(tableDataDetalhes);
 		tableRow.appendChild(tableDataEditar);
 		tableRow.appendChild(tableDataExcluir);
 
@@ -220,17 +225,15 @@ function deleteData(e) {
 			return resp.json();
 		})
 		.then(data => {
-			if (data.success) {
-				console.log("Excluído com sucesso");
-
+			if (data.success) {				
 				// reload grid
 				loadData();
 			}
 			else {
-				console.log(data.message);
+				alert(data.message);
 			}
 		})
-		.catch(err => console.log(err));
+		.catch(err => alert(err));
 
 
 }
@@ -266,19 +269,17 @@ function editData(e) {
 			return resp.json();
 		})
 		.then(data => {
-			if (data.success) {
-				console.log("Editado com sucesso");
-
+			if (data.success) {				
 				modal.hide();
 
 				// reload grid
 				loadData();
 			}
 			else {
-				console.log(data.message);
+				alert(data.message);
 			}
 		})
-		.catch(err => console.log(err));
+		.catch(err => alert(err));
 }
 
 function clearSession() {
@@ -288,5 +289,5 @@ function clearSession() {
 		.then(() => {
 			loadData();
 		})
-		.catch(err => console.log(err));
+		.catch(err => alert(err));
 }

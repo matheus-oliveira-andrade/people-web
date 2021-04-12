@@ -30,8 +30,7 @@ public class ExportServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		String idDocument = request.getParameter("idDocument");
-		System.out.println(idDocument);
+		String idDocument = request.getParameter("idDocument");		
 
 		if (idDocument == null) {
 			response.setStatus(500);
@@ -49,8 +48,7 @@ public class ExportServlet extends HttpServlet {
 			BufferedWriter writter = Files.newBufferedWriter(Paths.get(relativePath + filePath), StandardCharsets.UTF_8,
 					StandardOpenOption.CREATE);
 
-			for (People people : peoples) {
-				System.out.println(people.toString());
+			for (People people : peoples) {				
 				writter.write(people.toString());
 				writter.newLine();
 			}
